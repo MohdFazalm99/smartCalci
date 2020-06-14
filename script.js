@@ -1,23 +1,20 @@
 function getHistory(){
-    return document.getElementById("history-value").innerText;
+	return document.getElementById("history-value").innerText;
 }
-
 function printHistory(num){
-    return document.getElementById("history-value").innerText=num;
+	document.getElementById("history-value").innerText=num;
 }
-
 function getOutput(){
-    return document.getElementById("output-value").innerText;
+	return document.getElementById("output-value").innerText;
 }
 function printOutput(num){
-    if(num==""){
-        return document.getElementById("output-value").innerText=num;
-    }
-    else{
-        return document.getElementById("output-value").innerText=getFormattedNumber(num);
-    }
+	if(num==""){
+		document.getElementById("output-value").innerText=num;
+	}
+	else{
+		document.getElementById("output-value").innerText=getFormattedNumber(num);
+	}	
 }
-
 function getFormattedNumber(num){
 	if(num=="-"){
 		return "";
@@ -26,11 +23,9 @@ function getFormattedNumber(num){
 	var value = n.toLocaleString("en");
 	return value;
 }
-
 function reverseNumberFormat(num){
-    return Number(num.replace(/,/g,''))
+	return Number(num.replace(/,/g,''));
 }
-
 var operator = document.getElementsByClassName("operator");
 for(var i =0;i<operator.length;i++){
 	operator[i].addEventListener('click',function(){
@@ -80,4 +75,41 @@ for(var i =0;i<number.length;i++){
 			printOutput(output);
 		}
 	});
+}
+var microphone = document.getElementById('microphone');
+microphone.onclick=function(){
+	microphone.classList.add("record");
+	var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+	recognition.lang = 'en-US';
+	recognition.start();
+	operations = {"plus":"+",
+				 "minus":"-",
+				 "multiply":"*",
+				 "multiplied":"*",
+				 "divide":"/",
+				 "divided":"/",
+				 "reminder":"%"}
+	
+	recognition.onresult = function(event){
+		var input = event.results[0][0].transcript;
+		for(property in operations){
+			input= input.replace(property, operations[property]);
+		}
+		document.getElementById("output-value").innerText = input;
+		setTimeout(function(){
+			evaluate(input);
+		},2000);
+		microphone.classList.remove("record");
+	}
+	
+}
+function evaluate(input){
+	try{
+		var result = eval(input);
+		document.getElementById("output-value").innerText = result;
+	}
+	catch(e){
+		console.log(e);
+		document.getElementById("output-value").innerText = "";
+	}
 }
